@@ -351,14 +351,32 @@ abstract class Connection
 
     /**
      * Set socket.
+     * A wrapper can be registered to handle application layer transport
      *
-     * @param   string  $socket    Socket URI.
+     * @param   string  $socketUri    Socket URI.
      * @return  \Hoa\Socket
+     * @throws  \Hoa\Socket\Exception
      */
-    protected function setSocket($socket)
+    protected function setSocket($socketUri)
     {
+        $schemePos = strpos($socketUri, '://');
+        if ( false !== $schemePos &&
+            null !== $wrapper = Socket\Transport::getWrapper(
+                substr($socketUri, 0, $schemePos)
+            )) {
+            $socket = $wrapper($socketUri);
+            if( !($socket instanceof Socket) ) {
+                throw new Socket\Exception(
+                    'The wrapper registered for scheme "%s" is not valid, ' .
+                    'it must return a valid Hoa\Socket\Socket instance',
+                    0,
+                    substr($socketUri, 0, $schemePos));
+            }
+        } else {
+            $socket = new Socket($socketUri);
+        }
         $old           = $this->_socket;
-        $this->_socket = new Socket($socket);
+        $this->_socket = $socket;
 
         return $old;
     }
