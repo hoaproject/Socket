@@ -104,6 +104,12 @@ class Socket
      */
     protected $_transport   = null;
 
+    /**
+     * Flag to identify if the socket is secured or not
+     *
+     * @var boolean
+     */
+    protected $_secured     = false;
 
 
     /**
@@ -303,6 +309,16 @@ class Socket
     public function getTransport()
     {
         return $this->_transport;
+    }
+
+    /**
+     * Check if the socket is secured or not
+     *
+     * @return boolean
+     */
+    public function isSecured()
+    {
+        return $this->_secured;
     }
 
     /**
