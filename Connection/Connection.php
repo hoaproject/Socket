@@ -360,15 +360,15 @@ abstract class Connection
     protected function setSocket($socketUri)
     {
         $schemePos = strpos($socketUri, '://');
-        if ( false !== $schemePos &&
+        if (false !== $schemePos &&
             null !== $wrapper = Socket\Transport::getWrapper(
                 substr($socketUri, 0, $schemePos)
             )) {
             $socket = $wrapper($socketUri);
-            if( !($socket instanceof Socket) ) {
+            if (!($socket instanceof Socket)) {
                 throw new Socket\Exception(
                     'The wrapper registered for scheme "%s" is not valid, ' .
-                    'it must return a valid Hoa\Socket\Socket instance',
+                    'it must return a valid Hoa\Socket\Socket instance.',
                     0,
                     substr($socketUri, 0, $schemePos));
             }

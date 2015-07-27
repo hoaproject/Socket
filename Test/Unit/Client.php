@@ -34,90 +34,62 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Hoa\Socket;
+namespace Hoa\Socket\Test\Unit;
+
+use Hoa\Socket as LUT;
+use Hoa\Socket\Transport as SUT;
+use Hoa\Test;
 
 /**
- * Class \Hoa\Socket\Transport.
+ * Class \Hoa\Socket\Test\Unit\Client.
  *
- * Basic transports manipulation.
+ * Test suite for the client connection.
  *
  * @copyright  Copyright © 2007-2015 Hoa community
  * @license    New BSD License
  */
-class Transport
+class Client extends Test\Unit\Suite
 {
-    /**
-     * A collection of scheme wrappers.
-     * They are used to transformed a URI to \Hoa\Socket instance.
-     *
-     * @var array
-     */
-    protected static $_wrappers = [];
-
-    /**
-     * Get all enable transports.
-     *
-     * @return  array
-     */
-    public static function get()
+    public function case_set_socket_invalid_scheme_exception()
     {
-        static $_ = null;
-
-        if (null === $_) {
-            $_ = stream_get_transports();
-        }
-
-        return $_;
+        $this
+            ->exception(function () {
+                $client = new LUT\Client('scheme://domain.com');
+            })
+                ->isInstanceOf('\Hoa\Socket\Exception');
     }
 
-    /**
-     * Check if a transport exists.
-     *
-     * @param   string  $transport    Transport to check.
-     * @return  bool
-     */
-    public static function exists($transport)
+    public function case_set_socket_invalid_url_exception()
     {
-        return in_array(strtolower($transport), self::get());
+        $this
+            ->exception(function () {
+                $client = new LUT\Client('invalid-url');
+            })
+                ->isInstanceOf('\Hoa\Socket\Exception');
     }
 
-    /**
-     * Register a new wrapper.
-     *
-     * @param  string   $protocol The registered protocol (scheme://).
-     * @param  callable $factory  The factory callable.
-     * @return void
-     */
-    public static function registerWrapper($protocol, callable $factory)
+    public function case_set_socket()
     {
-        static::$_wrappers[$protocol] = $factory;
-
-        return;
+        $this
+            ->when($client = new LUT\Client('tcp://*:443'))
+                ->object($client->getSocket())
+                    ->isInstanceOf('\Hoa\Socket\Socket');
     }
 
-    /**
-     * Check wether a wrapper exists.
-     *
-     * @param  string $protocol The protocol to check.
-     * @return bool
-     */
-    public static function wrapperExists($protocol)
+    public function case_set_wrapped_socket()
     {
-        return true === array_key_exists($protocol, static::$_wrappers);
-    }
+        $this
+            ->given(
+                SUT::registerWrapper('scheme', function ($scheme) {
+                    $scheme = str_replace('scheme://', 'udp://', $scheme);
 
-    /**
-     * Retrieve the registered wrapper for a protocol.
-     *
-     * @param  string $protocol The protocol to search.
-     * @return callable|null
-     */
-    public static function getWrapper($protocol)
-    {
-        if (false === static::wrapperExists($protocol)) {
-            return null;
-        }
-
-        return static::$_wrappers[$protocol];
+                    return new LUT\Socket($scheme);
+                })
+            )
+            ->when($result = new LUT\Client('scheme://domain.com'))
+                ->object($result->getSocket())
+                    ->isInstanceOf('Hoa\Socket\Socket')
+                ->string($result->getSocket()->getTransport())
+                    ->isEqualTo('udp');
     }
 }
