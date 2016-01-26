@@ -153,27 +153,27 @@ abstract class Handler
         while (true) {
             foreach ($connection->select() as $node) {
 
-            // Connection has failed to detect the node, maybe it is a resource
-            // from a merged client in a server.
-            if (false === is_object($node)) {
-                $socket = $node;
+                // Connection has failed to detect the node, maybe it is a resource
+                // from a merged client in a server.
+                if (false === is_object($node)) {
+                    $socket = $node;
 
-                foreach ($this->_connections as $other) {
-                    $otherConnection = $other->getOriginalConnection();
+                    foreach ($this->_connections as $other) {
+                        $otherConnection = $other->getOriginalConnection();
 
-                    if (!($otherConnection instanceof Socket\Client)) {
-                        continue;
-                    }
+                        if ( ! ($otherConnection instanceof Socket\Client)) {
+                            continue;
+                        }
 
-                    $node = $otherConnection->getCurrentNode();
+                        $node = $otherConnection->getCurrentNode();
 
-                    if ($node->getSocket() === $socket) {
-                        $other->_run($node);
+                        if ($node->getSocket() === $socket) {
+                            $other->_run($node);
 
-                        continue 2;
+                            continue 2;
+                        }
                     }
                 }
-            }
 
                 foreach ($this->_connections as $other) {
                     if (true === $connection->is($other->getOriginalConnection())) {
@@ -181,6 +181,12 @@ abstract class Handler
 
                         continue 2;
                     }
+                }
+
+                // Node may still be a resource if there are no connections
+                // from which to get a node
+                if (false === is_object($node)) {
+                    continue;
                 }
 
                 $this->_run($node);
