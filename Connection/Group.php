@@ -91,12 +91,12 @@ class Group implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param   \Hoa\Socket\Connection\Handler  $connection    Connection
      *                                                         (handler).
      * @return  void
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function offsetSet($offset, $connection)
     {
         if (!($connection instanceof Handler)) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 '%s only accepts %s\Handler objects.',
                 0,
                 [__CLASS__, __NAMESPACE__]
@@ -121,11 +121,11 @@ class Group implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param   mixed  $offset    Offset.
      * @return  void
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function offsetUnset($offset)
     {
-        throw new Socket\Exception(
+        throw new Socket\Exception\Exception(
             'This operation is not allowed: you cannot unset a connection ' .
             'from a group.',
             1
@@ -172,12 +172,12 @@ class Group implements \ArrayAccess, \IteratorAggregate, \Countable
      * Run the group of connections.
      *
      * @return  void
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function run()
     {
         if (0 === count($this)) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 'Nothing to run. You should merge a connection.',
                 2
             );

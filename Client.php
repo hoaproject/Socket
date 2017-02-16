@@ -37,6 +37,7 @@
 namespace Hoa\Socket;
 
 use Hoa\Consistency;
+use Hoa\Socket\Connection;
 use Hoa\Stream;
 
 /**
@@ -47,7 +48,7 @@ use Hoa\Stream;
  * @copyright  Copyright © 2007-2017 Hoa community
  * @license    New BSD License
  */
-class Client extends Connection
+class Client extends Connection\Connection
 {
     /**
      * Open client socket asynchronously.
@@ -161,7 +162,7 @@ class Client extends Connection
      * @param   string               $streamName    Socket URI.
      * @param   \Hoa\Stream\Context  $context       Context.
      * @return  resource
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     protected function &_open($streamName, Stream\Context $context = null)
     {
@@ -186,9 +187,9 @@ class Client extends Connection
 
         if (false === $connection) {
             if ($errno === 0) {
-                throw new Exception('Client cannot join %s.', 0, $streamName);
+                throw new Exception\Exception('Client cannot join %s.', 0, $streamName);
             } else {
-                throw new Exception(
+                throw new Exception\Exception(
                     'Client returns an error (number %d): %s while trying ' .
                     'to join %s.',
                     1,
@@ -245,14 +246,14 @@ class Client extends Connection
     /**
      * Consider another client when selecting connection.
      *
-     * @param   \Hoa\Socket\Connection  $other    Other client.
+     * @param   \Hoa\Socket\Connection\Connection  $other    Other client.
      * @return  \Hoa\Socket\Client
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
-    public function consider(Connection $other)
+    public function consider(Connection\Connection $other)
     {
         if (!($other instanceof self)) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'Other client must be of type %s.',
                 2,
                 __CLASS__
@@ -273,10 +274,10 @@ class Client extends Connection
     /**
      * Check if the current node belongs to a specific server.
      *
-     * @param   \Hoa\Socket\Connection  $server    Server.
+     * @param   \Hoa\Socket\Connection\Connection  $server    Server.
      * @return  bool
      */
-    public function is(Connection $server)
+    public function is(Connection\Connection $server)
     {
         return $this->getStream() === $server->getStream();
     }

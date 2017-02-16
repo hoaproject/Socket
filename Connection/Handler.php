@@ -54,14 +54,14 @@ abstract class Handler
     /**
      * Original connection.
      *
-     * @var \Hoa\Socket\Connection
+     * @var \Hoa\Socket\Connection\Connection
      */
     protected $_originalConnection = null;
 
     /**
      * Current connection.
      *
-     * @var \Hoa\Socket\Connection
+     * @var \Hoa\Socket\Connection\Connection
      */
     protected $_connection         = null;
 
@@ -77,7 +77,7 @@ abstract class Handler
     /**
      * Constructor. Must be called.
      *
-     * @param   \Hoa\Socket\Connection  $connection    Connection.
+     * @param   \Hoa\Socket\Connection\Connection  $connection    Connection.
      */
     public function __construct(Connection $connection)
     {
@@ -90,8 +90,8 @@ abstract class Handler
     /**
      * Set current connection.
      *
-     * @param   \Hoa\Socket\Connection  $connection    Connection.
-     * @return  \Hoa\Socket\Connection
+     * @param   \Hoa\Socket\Connection\Connection  $connection    Connection.
+     * @return  \Hoa\Socket\Connection\Connection
      */
     protected function setConnection(Connection $connection)
     {
@@ -104,7 +104,7 @@ abstract class Handler
     /**
      * Get original connection.
      *
-     * @return  \Hoa\Socket\Connection
+     * @return  \Hoa\Socket\Connection\Connection
      */
     protected function getOriginalConnection()
     {
@@ -114,7 +114,7 @@ abstract class Handler
     /**
      * Get current connection.
      *
-     * @return  \Hoa\Socket\Connection
+     * @return  \Hoa\Socket\Connection\Connection
      */
     public function getConnection()
     {
@@ -245,6 +245,7 @@ abstract class Handler
      * @param   \Hoa\Socket\Node  $node       Node (if null, current node).
      *                                        current node).
      * @return  mixed
+     * @throws \Exception
      */
     public function send($message, Socket\Node $node = null)
     {

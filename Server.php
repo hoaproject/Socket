@@ -37,6 +37,7 @@
 namespace Hoa\Socket;
 
 use Hoa\Consistency;
+use Hoa\Socket\Connection;
 use Hoa\Stream;
 
 /**
@@ -47,7 +48,7 @@ use Hoa\Stream;
  * @copyright  Copyright © 2007-2017 Hoa community
  * @license    New BSD License
  */
-class Server extends Connection
+class Server extends Connection\Connection
 {
     /**
      * Tell a stream to bind to the specified target.
@@ -157,7 +158,7 @@ class Server extends Connection
      * @param   int     $flag       Flag, see the child::* constants.
      * @param   string  $context    Context ID (please, see the
      *                              \Hoa\Stream\Context class).
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function __construct(
         $socket,
@@ -189,7 +190,7 @@ class Server extends Connection
 
                 case 'udp':
                     if ($flag & self::LISTEN) {
-                        throw new Exception(
+                        throw new Exception\Exception(
                             'Cannot use the flag ' .
                             '\Hoa\Socket\Server::LISTEN ' .
                             'for connect-less transports (such as UDP).',
@@ -214,7 +215,7 @@ class Server extends Connection
      * @param   string               $streamName    Socket URI.
      * @param   \Hoa\Stream\Context  $context       Context.
      * @return  resource
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     protected function &_open($streamName, Stream\Context $context = null)
     {
@@ -236,7 +237,7 @@ class Server extends Connection
         }
 
         if (false === $this->_master) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'Server cannot join %s and returns an error (number %d): %s.',
                 1,
                 [$streamName, $errno, $errstr]
@@ -286,7 +287,7 @@ class Server extends Connection
      * Connect and accept the first connection.
      *
      * @return  \Hoa\Socket\Server
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function connect()
     {
@@ -295,7 +296,7 @@ class Server extends Connection
         $client = @stream_socket_accept($this->_master);
 
         if (false === $client) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'Operation timed out (nothing to accept).',
                 2
             );
@@ -320,7 +321,7 @@ class Server extends Connection
      * Select connections.
      *
      * @return  \Hoa\Socket\Server
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function select()
     {
@@ -337,7 +338,7 @@ class Server extends Connection
                 $client = @stream_socket_accept($socket);
 
                 if (false === $client) {
-                    throw new Exception(
+                    throw new Exception\Exception(
                         'Operation timed out (nothing to accept).',
                         3
                     );
@@ -363,10 +364,10 @@ class Server extends Connection
     /**
      * Consider another server when selecting connection.
      *
-     * @param   \Hoa\Socket\Connection  $other    Other server.
+     * @param   Connection  $other    Other server.
      * @return  \Hoa\Socket\Server
      */
-    public function consider(Connection $other)
+    public function consider(Connection\Connection $other)
     {
         if ($other instanceof Client) {
             if (true === $other->isDisconnected()) {
@@ -393,10 +394,10 @@ class Server extends Connection
     /**
      * Check if the current node belongs to a specific server.
      *
-     * @param   \Hoa\Socket\Connection  $server    Server.
+     * @param   \Hoa\Socket\Connection\Connection  $server    Server.
      * @return  bool
      */
-    public function is(Connection $server)
+    public function is(Connection\Connection $server)
     {
         return $this->getCurrentNode()->getConnection() === $server;
     }
