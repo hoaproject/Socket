@@ -36,8 +36,8 @@
 
 namespace Hoa\Socket\Exception;
 
-use Hoa\Consistency;
-use Hoa\Exception as HoaException;
+use Hoa\Consistency\Consistency;
+use Hoa\Exception\Exception as HoaException;
 
 /**
  * Class \Hoa\Socket\Exception\Exception.

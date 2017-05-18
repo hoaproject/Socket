@@ -36,7 +36,7 @@
 
 namespace Hoa\Socket;
 
-use Hoa\Consistency;
+use Hoa\Consistency\Consistency;
 
 /**
  * Class \Hoa\Socket.
@@ -129,7 +129,7 @@ class Socket
      *
      * @param   string  $uri    URI.
      * @return  string
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function setURI($uri)
     {
@@ -143,7 +143,7 @@ class Socket
             $matches);
 
         if (0 === $m) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'URI %s is not recognized (it is not an IPv6, IPv4 nor ' .
                 'domain name).',
                 0,
@@ -191,7 +191,7 @@ class Socket
                 (function_exists('socket_create') && !defined('AF_INET6'))
             )
            ) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'IPv6 support has been disabled from PHP, we cannot use ' .
                 'the %s URI.',
                 1,
@@ -207,12 +207,12 @@ class Socket
      *
      * @param   int  $port    Port.
      * @return  int
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     protected function setPort($port)
     {
         if ($port < 0) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'Port must be greater or equal than zero, given %d.',
                 2,
                 $port
@@ -230,14 +230,14 @@ class Socket
      *
      * @param   string  $transport    Transport (TCP, UDP etc.).
      * @return  string
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     protected function setTransport($transport)
     {
         $transport = strtolower($transport);
 
         if (false === Transport::exists($transport)) {
-            throw new Exception(
+            throw new Exception\Exception(
                 'Transport %s is not enabled on this machin.',
                 3,
                 $transport

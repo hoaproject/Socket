@@ -36,7 +36,7 @@
 
 namespace Hoa\Socket\Connection;
 
-use Hoa\Consistency;
+use Hoa\Consistency\Consistency;
 use Hoa\Socket;
 use Hoa\Stream;
 
@@ -49,7 +49,7 @@ use Hoa\Stream;
  * @license    New BSD License
  */
 abstract class Connection
-    extends    Stream
+    extends    Stream\Stream
     implements Stream\IStream\In,
                Stream\IStream\Out,
                Stream\IStream\Pathable,
@@ -72,7 +72,7 @@ abstract class Connection
     /**
      * Socket.
      *
-     * @var \Hoa\Socket
+     * @var Socket\Socket
      */
     protected $_socket        = null;
 
@@ -188,7 +188,7 @@ abstract class Connection
     /**
      * Connect.
      *
-     * @return  \Hoa\Socket\Connection
+     * @return  \Hoa\Socket\Connection\Connection
      */
     public function connect()
     {
@@ -204,22 +204,22 @@ abstract class Connection
     /**
      * Select connections.
      *
-     * @return  \Hoa\Socket\Connection
+     * @return  \Hoa\Socket\Connection\Connection
      */
     abstract public function select();
 
     /**
      * Consider another connection when selecting connection.
      *
-     * @param   \Hoa\Socket\Connection  $other    Other connection.
-     * @return  \Hoa\Socket\Connection
+     * @param   \Hoa\Socket\Connection\Connection  $other    Other connection.
+     * @return  \Hoa\Socket\Connection\Connection
      */
     abstract public function consider(Connection $other);
 
     /**
      * Check if the current node belongs to a specific server.
      *
-     * @param   \Hoa\Socket\Connection  $connection    Connection.
+     * @param   \Hoa\Socket\Connection\Connection  $connection    Connection.
      * @return  bool
      */
     abstract public function is(Connection $connection);
@@ -364,20 +364,20 @@ abstract class Connection
      * Set socket.
      *
      * @param   string  $socketUri    Socket URI.
-     * @return  \Hoa\Socket
-     * @throws  \Hoa\Socket\Exception
+     * @return  Socket\Socket
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     protected function setSocket($socketUri)
     {
         if (false === $pos = strpos($socketUri, '://')) {
-            $socket = new Socket($socketUri);
+            $socket = new Socket\Socket($socketUri);
         } else {
             $transport = substr($socketUri, 0, $pos);
             $factory   = Socket\Transport::getFactory($transport);
             $socket    = $factory($socketUri);
 
-            if (!($socket instanceof Socket)) {
-                throw new Socket\Exception(
+            if (!($socket instanceof Socket\Socket)) {
+                throw new Socket\Exception\Exception(
                     'The transport registered for scheme “%s” is not valid: ' .
                     'It must return a valid Hoa\Socket\Socket instance.',
                     0,
@@ -525,7 +525,7 @@ abstract class Connection
     /**
      * Get socket.
      *
-     * @return  \Hoa\Socket
+     * @return  \Hoa\Socket\Socket
      */
     public function getSocket()
     {
@@ -661,12 +661,12 @@ abstract class Connection
      * @param   int    $length    Length.
      * @param   int    $flags     Flags.
      * @return  string
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      */
     public function read($length, $flags = 0)
     {
         if (null === $this->getStream()) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 'Cannot read because socket is not established, ' .
                 'i.e. not connected.',
                 1
@@ -674,7 +674,7 @@ abstract class Connection
         }
 
         if (0 > $length) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 'Length must be greater than 0, given %d.',
                 2,
                 $length
@@ -808,13 +808,13 @@ abstract class Connection
      * @param   string  $string    String.
      * @param   int     $length    Length.
      * @return  mixed
-     * @throws  \Hoa\Socket\Exception
+     * @throws  \Hoa\Socket\Exception\Exception
      * @throws  \Hoa\Socket\Exception\BrokenPipe
      */
     public function write($string, $length)
     {
         if (null === $this->getStream()) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 'Cannot write because socket is not established, ' .
                 'i.e. not connected.',
                 3
@@ -822,7 +822,7 @@ abstract class Connection
         }
 
         if (0 > $length) {
-            throw new Socket\Exception(
+            throw new Socket\Exception\Exception(
                 'Length must be greater than 0, given %d.',
                 4,
                 $length
