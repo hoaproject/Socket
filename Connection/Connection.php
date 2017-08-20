@@ -681,21 +681,31 @@ abstract class Connection
             );
         }
 
-        if (true === $this->isEncrypted()) {
-            return fread($this->getStream(), $length);
-        }
+        $out = '';
 
-        if (false === $this->isRemoteAddressConsidered()) {
-            return stream_socket_recvfrom($this->getStream(), $length, $flags);
-        }
+        do {
+            $buffer = null;
+            $readLength = $length - strlen($out);
 
-        $out = stream_socket_recvfrom(
-            $this->getStream(),
-            $length,
-            $flags,
-            $address
-        );
-        $this->_remoteAddress = !empty($address) ? $address : null;
+            if (0 === $readLength) {
+                break;
+            }
+
+            if (true === $this->isEncrypted()) {
+                $buffer = fread($this->getStream(), $readLength);
+
+                if ('' === $buffer) {
+                    $buffer = false;
+                }
+            } else {
+                $buffer = stream_socket_recvfrom($this->getStream(), $readLength, $flags);
+            }
+
+            if ($buffer) {
+                $out .= $buffer;
+            }
+
+        } while(false !== $buffer);
 
         return $out;
     }
