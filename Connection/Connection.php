@@ -683,29 +683,25 @@ abstract class Connection
 
         $out = '';
 
-        do {
-            $buffer = null;
+        while(true) {
             $readLength = $length - strlen($out);
 
-            if (0 === $readLength) {
+            if (0 >= $readLength) {
                 break;
             }
 
             if (true === $this->isEncrypted()) {
                 $buffer = fread($this->getStream(), $readLength);
-
-                if ('' === $buffer) {
-                    $buffer = false;
-                }
             } else {
                 $buffer = stream_socket_recvfrom($this->getStream(), $readLength, $flags);
             }
 
-            if ($buffer) {
+            if ('' !== $buffer && is_string($buffer)) {
                 $out .= $buffer;
+            } else {
+                break;
             }
-
-        } while(false !== $buffer);
+        }
 
         return $out;
     }
