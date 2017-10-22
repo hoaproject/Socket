@@ -658,12 +658,14 @@ abstract class Connection
      * Warning: if this method returns false, it means that the buffer is empty.
      * You should use the Hoa\Stream::setStreamBlocking(true) method.
      *
-     * @param   int    $length    Length.
-     * @param   int    $flags     Flags.
+     * @param   int     $length    Length.
+     * @param   int     $flags     Flags.
+     * @param   boolean $keepReading If we loop over stream to seek length data ot not.
+     * @param   int     $chunk     Length bloc read in the stream.
      * @return  string
      * @throws  \Hoa\Socket\Exception
      */
-    public function read($length, $flags = 0)
+    public function read($length, $flags = 0, $keepReading = true, $chunk = null)
     {
         if (null === $this->getStream()) {
             throw new Socket\Exception(
@@ -681,9 +683,13 @@ abstract class Connection
             );
         }
 
+        if (is_int($chunk)) {
+            stream_set_chunk_size($this->getStream(), $chunk);
+        }
+
         $out = '';
 
-        while(true) {
+        do {
             $readLength = $length - strlen($out);
 
             if (0 >= $readLength) {
@@ -701,7 +707,7 @@ abstract class Connection
             } else {
                 break;
             }
-        }
+        } while($keepReading);
 
         return $out;
     }
