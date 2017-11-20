@@ -644,26 +644,18 @@ abstract class Connection
     }
 
     /**
-     * Get remote address.
-     *
-     * @return  string
-     */
-    public function getRemoteAddress()
-    {
-        return $this->_remoteAddress;
-    }
-
-    /**
      * Read n characters.
      * Warning: if this method returns false, it means that the buffer is empty.
      * You should use the Hoa\Stream::setStreamBlocking(true) method.
      *
-     * @param   int    $length    Length.
-     * @param   int    $flags     Flags.
+     * @param   int     $length    Length.
+     * @param   int     $flags     Flags.
+     * @param   boolean $keepReading If we loop over stream to seek length data or not.
+     * @param   int     $chunk     Length bloc read in the stream.
      * @return  string
      * @throws  \Hoa\Socket\Exception
      */
-    public function read($length, $flags = 0)
+    public function read($length, $flags = 0, $keepReading = null, $chunk = null)
     {
         if (null === $this->getStream()) {
             throw new Socket\Exception(
@@ -681,23 +673,52 @@ abstract class Connection
             );
         }
 
-        if (true === $this->isEncrypted()) {
-            return fread($this->getStream(), $length);
+        if (is_int($chunk) && 0 < $chunk) {
+            $originalChunk = stream_set_chunk_size($this->getStream(), $chunk);
         }
 
-        if (false === $this->isRemoteAddressConsidered()) {
-            return stream_socket_recvfrom($this->getStream(), $length, $flags);
+        if (null === $keepReading) {
+            $streamMetaData = $this->getStreamMetaData();
+            $keepReading = 0 === $streamMetaData['blocked'];
         }
 
-        $out = stream_socket_recvfrom(
-            $this->getStream(),
-            $length,
-            $flags,
-            $address
-        );
-        $this->_remoteAddress = !empty($address) ? $address : null;
+        $out = '';
+
+        do {
+            $readLength = $length - strlen($out);
+
+            if (0 >= $readLength) {
+                break;
+            }
+
+            if (true === $this->isEncrypted()) {
+                $buffer = fread($this->getStream(), $readLength);
+            } else {
+                $buffer = stream_socket_recvfrom($this->getStream(), $readLength, $flags);
+            }
+
+            if ('' !== $buffer && is_string($buffer)) {
+                $out .= $buffer;
+            } else {
+                break;
+            }
+        } while($keepReading);
+
+        if (false === empty($originalChunk) && 0 < $originalChunk) {
+            stream_set_chunk_size($this->getStream(), $originalChunk);
+        }
 
         return $out;
+    }
+
+    /**
+     * Get remote address.
+     *
+     * @return  string
+     */
+    public function getRemoteAddress()
+    {
+        return $this->_remoteAddress;
     }
 
     /**
