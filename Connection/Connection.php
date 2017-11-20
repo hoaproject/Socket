@@ -39,7 +39,6 @@ namespace Hoa\Socket\Connection;
 use Hoa\Consistency;
 use Hoa\Socket;
 use Hoa\Stream;
-use Hoa\Option;
 
 /**
  * Class \Hoa\Socket\Connection.
