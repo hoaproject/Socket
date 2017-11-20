@@ -39,6 +39,7 @@ namespace Hoa\Socket\Connection;
 use Hoa\Consistency;
 use Hoa\Socket;
 use Hoa\Stream;
+use Hoa\Option;
 
 /**
  * Class \Hoa\Socket\Connection.
@@ -644,28 +645,18 @@ abstract class Connection
     }
 
     /**
-     * Get remote address.
-     *
-     * @return  string
-     */
-    public function getRemoteAddress()
-    {
-        return $this->_remoteAddress;
-    }
-
-    /**
      * Read n characters.
      * Warning: if this method returns false, it means that the buffer is empty.
      * You should use the Hoa\Stream::setStreamBlocking(true) method.
      *
      * @param   int     $length    Length.
      * @param   int     $flags     Flags.
-     * @param   boolean $keepReading If we loop over stream to seek length data ot not.
+     * @param   boolean $keepReading If we loop over stream to seek length data or not.
      * @param   int     $chunk     Length bloc read in the stream.
      * @return  string
      * @throws  \Hoa\Socket\Exception
      */
-    public function read($length, $flags = 0, $keepReading = true, $chunk = null)
+    public function read($length, $flags = 0, $keepReading = null, $chunk = null)
     {
         if (null === $this->getStream()) {
             throw new Socket\Exception(
@@ -683,8 +674,13 @@ abstract class Connection
             );
         }
 
-        if (is_int($chunk)) {
-            stream_set_chunk_size($this->getStream(), $chunk);
+        if (is_int($chunk) && 0 < $chunk) {
+            $originalChunk = stream_set_chunk_size($this->getStream(), $chunk);
+        }
+
+        if (null === $keepReading) {
+            $streamMetaData = $this->getStreamMetaData();
+            $keepReading = 0 === $streamMetaData['blocked'];
         }
 
         $out = '';
@@ -709,7 +705,21 @@ abstract class Connection
             }
         } while($keepReading);
 
+        if (false === empty($originalChunk) && 0 < $originalChunk) {
+            stream_set_chunk_size($this->getStream(), $originalChunk);
+        }
+
         return $out;
+    }
+
+    /**
+     * Get remote address.
+     *
+     * @return  string
+     */
+    public function getRemoteAddress()
+    {
+        return $this->_remoteAddress;
     }
 
     /**
