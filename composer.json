@@ -23,6 +23,8 @@
         "docs"  : "https://central.hoa-project.net/Documentation/Library/Socket",
         "source": "https://central.hoa-project.net/Resource/Library/Socket"
     },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
     "require": {
         "php"            : ">=7.1",
         "hoa/consistency": "dev-master",

@@ -121,4 +121,12 @@ class Node
     {
         return $this->_encryptionType;
     }
+
+    /**
+     * Get peer connection name.
+     */
+    public function getPeerName(bool $wantPeer = true): string
+    {
+        return stream_socket_get_name($this->getSocket(), $wantPeer);
+    }
 }
