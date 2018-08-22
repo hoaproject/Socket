@@ -693,9 +693,8 @@ class Connection extends Test\Unit\Suite
 
                 $this->calling($connection)->getStream   = $stream,
                 $this->calling($connection)->isEncrypted = false,
-                $this->function->stream_socket_recvfrom  = function ($_stream, $_length, $_flags, &$address) use ($self, &$called, $stream, $length, $flags) {
+                $this->function->stream_socket_recvfrom  = function ($_stream, $_length, $_flags) use ($self, &$called, $stream, $length, $flags) {
                     $called  = true;
-                    $address = '1.2.3.4';
 
                     $self
                         ->string($_stream)
@@ -714,8 +713,8 @@ class Connection extends Test\Unit\Suite
                     ->isEqualTo('hello')
                 ->boolean($called)
                     ->isTrue()
-                ->string($connection->getRemoteAddress())
-                    ->isEqualTo('1.2.3.4');
+                ->variable($connection->getRemoteAddress())
+                    ->isNull();
     }
 
     public function case_read_string(): void

@@ -115,11 +115,6 @@ abstract class Connection extends Stream implements Stream\IStream\In, Stream\IS
     protected $_remote        = false;
 
     /**
-     * Remote address.
-     */
-    protected $_remoteAddress = null;
-
-    /**
      * Temporize selected connections when selecting.
      */
     protected $_iterator      = [];
@@ -284,7 +279,8 @@ abstract class Connection extends Stream implements Stream\IStream\In, Stream\IS
      */
     public function disconnect(): void
     {
-        $this->_disconnect = $this->close();
+        $this->close();
+        $this->_disconnect = true;
     }
 
     /**
@@ -522,7 +518,11 @@ abstract class Connection extends Stream implements Stream\IStream\In, Stream\IS
      */
     public function getRemoteAddress(): string
     {
-        return $this->_remoteAddress;
+        if (null === $this->_node) {
+            return null;
+        }
+
+        return $this->_node->getPeerName();
     }
 
     /**
@@ -556,15 +556,7 @@ abstract class Connection extends Stream implements Stream\IStream\In, Stream\IS
             return stream_socket_recvfrom($this->getStream(), $length, $flags);
         }
 
-        $out = stream_socket_recvfrom(
-            $this->getStream(),
-            $length,
-            $flags,
-            $address
-        );
-        $this->_remoteAddress = !empty($address) ? $address : null;
-
-        return $out;
+        return stream_socket_recvfrom($this->getStream(), $length, $flags);
     }
 
     /**
